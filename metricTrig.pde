@@ -1,4 +1,4 @@
-/*
+/* //<>//
   The purpose of this code is to create sin and cos esque tracing functions for circles in
  any metric space. It is made so that one can, for example, trace out the diamond like circle 
  in the taxi cab metric and switch over to some other metric without having to create a custom
@@ -54,7 +54,7 @@ import java.util.HashMap;
 import java.util.*;
 int samples = 10;
 float squareSize=1.0;
-int scale=200;
+int scale=100;
 
 HashMap<Float, PVector> angleTable = new HashMap<Float, PVector>();
 Float[] farr;
@@ -63,13 +63,13 @@ PrintWriter output;
 
 void setup() {
 
-  size(800, 600);
+  size(600, 600);
   stroke(255, 255, 0);
   strokeWeight(8);
 
   /*
     This is where go along the sides of a square to geneate points and calculate angles based
-    on those points and store those in a hash map
+   on those points and store those in a hash map
    */
   for (float i = -samples; i <= samples; i+=.1) {
     angleTable.put(degrees(atan2((float)-squareSize, (float)i/ (float)samples)), new PVector((float)i/ (float)samples, (float)-squareSize));
@@ -82,14 +82,13 @@ void setup() {
   angleTable.keySet().toArray(farr);
 
   Arrays.sort(farr);
-  for(Float f:farr){
-    print(f+", ");
-  }
 }
 
 //Here are the actual sin and cos functions
 
 float mSin(float angle) {
+  angle = (angle % 360) -180;
+  angle = getClosestValue(angle);
   if (angleTable.containsKey(Float.valueOf(angle))) {
     float x = angleTable.get(Float.valueOf(angle)).x;
     float y = angleTable.get(Float.valueOf(angle)).y;
@@ -99,6 +98,8 @@ float mSin(float angle) {
   return 0;
 }
 float mCos(float angle) {
+  angle = (angle % 360) -180;
+  angle = getClosestValue(angle);
   if (angleTable.containsKey(Float.valueOf(angle))) {
     float x = angleTable.get(Float.valueOf(angle)).x;
     float y = angleTable.get(Float.valueOf(angle)).y;
@@ -108,20 +109,55 @@ float mCos(float angle) {
   return 0;
 }
 
-//This function is used to define a hypotenuse
-//Change this to change the shape of the circle
+//This function is used to define a hypotenuse.
+//Change it to change the shape that is traced out.
 
 float hyp(float x, float y) {
-  //return(max(abs(x), abs(y)));
-  return(abs(x)+abs(y));
+  return(max(abs(x), abs(y)));
+  //return(sqrt(x*x+y*y));
 }
 
+/*
+  If the angle you want is not in the map, this function will
+  get an angle close to what you want.
+*/
+private float getClosestValue(float value) {
+  Float[] searchArr=farr.clone();
+
+  int index = 0, preInd =0;
+  Float lookingFor = value;
+  boolean found = false;
+
+
+  while (!found) {
+    preInd = index;
+    index = (int)(searchArr.length/2);
+    if (preInd == index) {
+      found = true;
+      if (searchArr.length==0 && index == 0) {
+        return(farr[index]);
+      }
+      return(searchArr[index]);
+    }
+    if (searchArr[index] == lookingFor) {
+      found = true;
+      return(searchArr[index]);
+    } else if (lookingFor < searchArr[index]) {
+      searchArr = Arrays.copyOfRange(searchArr, 0, index);
+    } else if (lookingFor > searchArr[index]) {
+      searchArr = Arrays.copyOfRange(searchArr, index, searchArr.length);
+    }
+  } 
+  return 0.0;
+}
+
+
+int i = 0;
 void draw() {
   background(0);
 
   translate(width/2, height/2);
-  for (Float f : farr) {
 
-    point(mCos(f)*scale, mSin(f)*scale);
-  }
+  point(mCos(i)*scale, mSin(i)*scale);
+  i+=1;
 }

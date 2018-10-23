@@ -52,7 +52,7 @@
  */
 import java.util.HashMap;
 import java.util.*;
-int samples = 10;
+int samples = 50;
 float squareSize=1.0;
 int scale=100;
 
@@ -66,6 +66,8 @@ void setup() {
   size(600, 600);
   stroke(255, 255, 0);
   strokeWeight(8);
+  background(0);
+  frameRate(120);
 
   /*
     This is where go along the sides of a square to geneate points and calculate angles based
@@ -113,14 +115,30 @@ float mCos(float angle) {
 //Change it to change the shape that is traced out.
 
 float hyp(float x, float y) {
-  return(max(abs(x), abs(y)));
-  //return(sqrt(x*x+y*y));
+  //return(max(abs(x), abs(y)));//square circle
+  
+  //return((abs(x)+abs(y)));//diamond circle
+  
+  //return(sqrt(x*x+y*y)); // circular circle
+  
+  //if (abs(y)>abs(x)) {//octo circle
+  //  return(1.41*abs(x)+0.9412*abs(y));//octo circle
+  //} return (1.41*abs(y)+0.9412*abs(x));//octo circle
+  
+  if (abs(y)>abs(x)) {//shuriken circle
+    return(2.41*abs(x)+0.9412*abs(y));//shuriken  circle
+  } return (2.41*abs(y)+0.9412*abs(x));//shuriken  circle
+  
+  
+  
+   
+  
 }
 
 /*
   If the angle you want is not in the map, this function will
-  get an angle close to what you want.
-*/
+ get an angle close to what you want.
+ */
 private float getClosestValue(float value) {
   Float[] searchArr=farr.clone();
 
@@ -152,12 +170,15 @@ private float getClosestValue(float value) {
 }
 
 
-int i = 0;
+float i = 0;
 void draw() {
-  background(0);
-
+  fill(0, 5);
+  noStroke();
+  rect(0,0,width,height);
+  stroke(255, 255, 0);
   translate(width/2, height/2);
 
   point(mCos(i)*scale, mSin(i)*scale);
-  i+=1;
+  i+=0.8;
+  saveFrame();
 }
